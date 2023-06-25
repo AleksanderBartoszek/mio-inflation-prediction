@@ -2,53 +2,46 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 
-# Wczytanie danych z pliku CSV
-data = pd.read_csv('../data/Inflacja-dane.csv')
+def normalize_data(data):
+    return (data - data.min()) / (data.max() - data.min())
 
+data = pd.read_csv('../data/Inflacja-dane.csv')
 dates = [datetime.datetime(y, m, 1) for m, y in zip(data['miesiąc'], data['rok'])]
 
-
-# Utworzenie wykresu dla inflacji r/r
-plt.figure(figsize=(10, 5))
-plt.plot(dates, data['inflacja r/r'], marker='o')
-plt.xlabel('Data')
-plt.ylabel('Inflacja r/r')
-plt.title('Inflacja na przestrzeni lat')
-plt.grid(True)
-plt.savefig('../img/inflacja_rr.png')
-
 # Utworzenie histogramu dla stopy bezrobocia
-plt.figure(figsize=(10, 5))
-plt.hist(data['stopa bezrobocia'], bins=10)
-plt.xlabel('Stopa bezrobocia')
+plt.figure()
+plt.hist(data['inflacja r/r'], bins=10)
+plt.xlabel('Inflacja')
 plt.ylabel('Liczebność')
-plt.title('Rozkład stopy bezrobocia')
+plt.title('Rozkład inflacji')
 plt.grid(True)
-plt.savefig('../img/stopa_bezrobocia_histogram.png')
+plt.savefig('../img/inflacja_histogram.png')
 
-# Utworzenie wykresu liniowego dla stopy bezrobocia
-plt.figure(figsize=(10, 5))
-plt.plot(data['rok'], data['stopa bezrobocia'], marker='o')
+# Utworzenie wykresu zawierającego wszystkie dane (znormalizowane do zakresu (0, 1)
+plt.figure(figsize=(20, 10))
+plt.scatter(dates, [x/100 - 1 for x in data.iloc[:, 2]], marker='o', label='Inflacja (%)')
+plt.scatter(dates, normalize_data(data.iloc[:, 3]), marker='.', label='Stopa bezrobocia')
+plt.scatter(dates, normalize_data(data.iloc[:, 4]), marker='.', label='PKB')
+plt.scatter(dates, normalize_data(data.iloc[:, 5]), marker='.', label='Podaż pieniądza')
+plt.scatter(dates, normalize_data(data.iloc[:, 6]), marker='.', label='Wynagrodzenia przeciętne')
+plt.scatter(dates, normalize_data(data.iloc[:, 7]), marker='.', label='HICP (Strefa Euro)')
+plt.scatter(dates, normalize_data(data.iloc[:, 8]), marker='.', label='Kurs USD wg NBP')
+plt.scatter(dates, normalize_data(data.iloc[:, 9]), marker='.', label='Produkcja przemysłowa')
 plt.xlabel('Rok')
-plt.ylabel('Stopa bezrobocia')
-plt.title('Stopa bezrobocia w kolejnych latach')
-plt.grid(True)
-plt.savefig('../img/stopa_bezrobocia.png')
+plt.ylabel('Wartość')
+plt.title('Analiza danych gospodarczych')
+plt.legend()
+plt.savefig('../img/analiza_danych_gospodarczych.png')
 
-# Utworzenie wykresu liniowego dla PKB r/r
-plt.figure(figsize=(10, 5))
-plt.plot(data['rok'], data['PKB r/r'], marker='o')
-plt.xlabel('Rok')
-plt.ylabel('PKB r/r')
-plt.title('Wzrost PKB r/r w kolejnych latach')
-plt.grid(True)
-plt.savefig('../img/pkb_rr.png')
+# Utworzenie wykresu loss
+with open('../data/loss.txt', 'r') as f:
+    loss = [float(x) for x in f.readlines()]
+    plt.figure()
+    plt.plot(loss)
+    plt.xlabel('Epoka')
+    plt.ylabel('Loss')
+    plt.title('Loss')
+    plt.grid(True)
+    plt.savefig('../img/loss.png')
 
-# Utworzenie wykresu słupkowego dla produkcji przemysłowej r/r
-plt.figure(figsize=(10, 5))
-plt.bar(data['rok'], data['Produkcja przemysłowa r/r'])
-plt.xlabel('Rok')
-plt.ylabel('Produkcja przemysłowa r/r')
-plt.title('Wzrost produkcji przemysłowej r/r w kolejnych latach')
-plt.grid(True)
-plt.savefig('../img/produkcja_przemyslowa_rr.png')
+
