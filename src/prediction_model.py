@@ -2,15 +2,6 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
-class CustomCallback(tf.keras.callbacks.Callback):
-    def __init__(self):
-        self.loss = []
-        self.accuracy = []
-
-    def on_epoch_end(self, epoch, logs=None):
-        self.loss.append(logs['loss'])
-        self.accuracy.append(logs['accuracy'])
-
 def main():
     # usunąłem dane do 1993 roku ze względu na ich brak, był tylko rok, miesiąc i wysokość inflacji
     data = pd.read_csv('../data/Inflacja-dane.csv', delimiter=',', dtype=float)
